@@ -1,59 +1,47 @@
-import {CommunityIconDark, CommunityIconLight, MessageIcon, SettingsIconDark, SettingsIconLight, StatusIconDark, StatusIconLight } from '../icons/NavbarIcons'
+import { BiSolidMessageDetail, BiMessageDetail } from "react-icons/bi";
+import { TbCircleDashed, TbMessageCircleFilled } from "react-icons/tb";
+import { LuMessageCircleDashed } from "react-icons/lu";
+import { BsPeople, BsPeopleFill } from "react-icons/bs";
+import { PiCircleDashedFill } from "react-icons/pi";
+import { useRecoilState } from "recoil";
+import { navAtom } from "../../hooks/atom";
+import NavButton from "../components/NavButtons";
 
+export default function Navbar() {
+  const [navItem, setNavItem] = useRecoilState(navAtom);
 
-export default function Navbar(){
-    return (
-          <div className="bg-pampas h-screen w-16 flex flex-col fixed left-0 right-0 p-4 border-r border-gray-200">
-              <div>
-              <Button type={"Icon"} theme={"Light"} text={"Message"}/>
-              <Button type={"Icon"} theme={"Light"} text={"Status"}/>
-              <Button type={"Icon"} theme={"Light"} text={"Community"}/>
-              <Button type={"Icon"} theme={"Light"} text={"Settings"}/>
-              </div>
-          </div>
-    )
+  return (
+    <div className="bg-pampas w-full h-16 md:h-screen md:w-16 fixed md:left-0 md:right-0 bottom-0 p-4 md:border-r border-gray-200">
+      <div className="flex gap-2 md:flex-col items-center w-full justify-around">
+        <NavButton
+          isActive={navItem === "messages"}
+          onClick={() => setNavItem("messages")}
+          activeIcon={<BiSolidMessageDetail className="text-black w-6 h-6" />}
+          inactiveIcon={<BiMessageDetail className="text-mediumdarkgray w-6 h-6" />}
+        />
+
+        <NavButton
+          isActive={navItem === "status"}
+          onClick={() => setNavItem("status")}
+          activeIcon={<PiCircleDashedFill className="text-black w-6 h-6" />}
+          inactiveIcon={<TbCircleDashed className="text-mediumdarkgray w-6 h-6" />}
+        />
+
+        <NavButton
+          isActive={navItem === "channels"}
+          onClick={() => setNavItem("channels")}
+          activeIcon={<TbMessageCircleFilled className="text-black w-6 h-6" />}
+          inactiveIcon={<LuMessageCircleDashed className="text-mediumdarkgray w-6 h-6" />}
+        />
+
+        <NavButton
+          isActive={navItem === "community"}
+          onClick={() => setNavItem("community")}
+          activeIcon={<BsPeopleFill className="text-black w-6 h-6" />}
+          inactiveIcon={<BsPeople className="text-mediumdarkgray w-6 h-6" />}
+        />
+
+      </div>
+    </div>
+  );
 }
-
-type buttonTheme = "Light" | "Dark";
-type buttonText = "Message" | "Status" | "Community" | "Channel" | "Settings";
-type buttonType = "Icon" | "Normal";
-
-// const buttonTextStyle: Record<buttonText, string> = {
-//     message : ""
-// }
-
-interface IIcon{
-    theme: buttonTheme,
-    text : buttonText
-}
-function Icon({theme, text}: any){
-    if (text==="Message") return <MessageIcon />
-    // if (theme === "Dark" && text==="Message") return <MessageIcon />
-    if (theme === "Light" && text==="Community") return <CommunityIconLight />
-    if (theme === "Dark" && text==="Community") return <CommunityIconDark /> 
-    if (theme === "Light" && text==="Status") return <StatusIconLight />
-    if (theme === "Dark" && text==="Status") return <StatusIconDark /> 
-    if (theme === "Light" && text==="Settings") return <SettingsIconLight />
-    if (theme === "Dark" && text==="Settings") return <SettingsIconDark />
-    // if (theme === "Light" && text==="Message") return <MessageIconLight />
-    // if (theme === "Dark" && text==="Message") return <MessageIconDark />
-    // if (theme === "Light" && text==="Message") return <MessageIconLight />
-    // if (theme === "Dark" && text==="Message") return <MessageIconDark />
-}
-
-interface IButtons{
-    theme: buttonTheme,
-    type: buttonType,
-    text:  buttonText
-}
-
-function Button({theme, type, text}: any){
-    // const icon = 
-    return(
-        <button type="button" className="focus:bg-">
-            <Icon theme={theme} text={text} className="text-black"/>
-            {type === "normal"? <span>{text}</span> : null}
-        </button>
-    )
-}
-

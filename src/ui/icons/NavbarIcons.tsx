@@ -7,11 +7,6 @@ export function MessageIcon() {
 
     )
 }
-// export function MessageIconDark(){
-//     return(
-//         <img src="/assets/message-dark.svg"/>
-//     )
-// }
 export function CommunityIconLight() {
     return (
         <img src="/assets/community-light.svg" />
@@ -34,12 +29,20 @@ export function SettingsIconDark() {
 }
 export function StatusIconLight() {
     return (
-        <img src="/assets/status-light.svg" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="1.5" stroke="currentColor"
+        className="w-6 h-6 stroke-2 stroke-[#3b3b3b] cursor-pointer">
+      <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
     )
 }
 export function StatusIconDark() {
     return (
-        <img src="/assets/status-dark.svg" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="1.5" stroke="currentColor"
+        className="w-6 h-6 stroke-2 stroke-[#3b3b3b] cursor-pointer">
+      <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
     )
 }
 
@@ -75,6 +78,14 @@ export function SearchIcon2() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"  className="w-6 h-6 stroke-2 stroke-[#3b3b3b] cursor-pointer">
   <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+</svg>
+
+    )
+}
+export function VideoIcon() {
+    return (
+        <svg className="w-6 h-6 stroke-2 stroke-[#3b3b3b] cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1Zm7 11-6-2V9l6-2v10Z"/>
 </svg>
 
     )

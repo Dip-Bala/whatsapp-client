@@ -1,4 +1,4 @@
-import { OptionsIcon, SearchIcon2 } from "../icons/NavbarIcons";
+import { OptionsIcon, SearchIcon2, VideoIcon } from "../icons/NavbarIcons";
 
 export default function ChatBar(){
     return (
@@ -8,7 +8,7 @@ export default function ChatBar(){
                   <p>Chutku</p>
             </div>
             <div className="flex items-center gap-4">
-                  {/* < */}
+            <VideoIcon />
                   <SearchIcon2/>
                   <OptionsIcon />
             </div>
@@ -16,3 +16,4 @@ export default function ChatBar(){
           </div>
     )
 }
+
