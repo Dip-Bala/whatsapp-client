@@ -1,48 +1,69 @@
 import { FaUserPlus } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { API_URL } from "../../config";
 
 interface Contact {
-  id: number;
+  _id: string;
   name: string;
   email: string;
+  isOnWhatsApp?: boolean;
 }
 
 export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
-  const [contacts, setContacts] = useState<Contact[]>([
-    { id: 1, name: "Alice", email: "alice@email.com" },
-    { id: 2, name: "Bob", email: "bob@email.com" }
-  ]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
 
+  const token = localStorage.getItem("authorization");
+
+  // Fetch contacts from DB
+  useEffect(() => {
+    async function fetchContacts() {
+      try {
+        const res = await axios.get(`${API_URL}/contacts`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setContacts(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchContacts();
+  }, []);
+
+  // Save contact to DB
+  async function handleAddContact(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${API_URL}/contacts`,
+        { name: newName, email: newEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setContacts(prev => [...prev, res.data]); // Update local state
+      setNewName("");
+      setNewEmail("");
+      setShowForm(false);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   const filteredContacts = contacts
     .filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  function handleAddContact(e: React.FormEvent) {
-    e.preventDefault();
-    setContacts(prev => [
-      ...prev,
-      { id: prev.length + 1, name: newName, email: newEmail }
-    ]);
-    setNewName("");
-    setNewEmail("");
-    setShowForm(false);
-  }
-
   return (
     <div className="md:border-r border-black/20 h-screen w-full md:w-sm lg:w-md md:ml-16 p-4 overflow-y-scroll bg-white">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-semibold text-xl">Contacts</h2>
-        <button
-          onClick={onBack}
-          className="text-sm text-gray-500 hover:underline"
-        >
-          Back
+      <div className="bg-amber-300 flex justify-between p-2">
+        <button onClick={onBack} className="text-sm text-gray-500 hover:underline">
+          backkk
         </button>
+        <p className="font-semibold text-xl">New Chat</p>
       </div>
 
       {/* Search bar */}
@@ -52,7 +73,7 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
           placeholder="Search contacts..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 border rounded px-3 py-2"
+          className="bg-pampas rounded-4xl pl-4 py-2 placeholder:text-sm placeholder:text-mediumdarkgray focus:outline-logogreen flex-1"
         />
         <button
           onClick={() => setShowForm(true)}
@@ -94,11 +115,13 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
       <div className="space-y-2">
         {filteredContacts.map(contact => (
           <div
-            key={contact.id}
-            className="p-2 border rounded hover:bg-gray-100 cursor-pointer"
+            key={contact._id}
+            className="p-2 rounded hover:bg-gray-100 cursor-pointer"
           >
             <p className="font-medium">{contact.name}</p>
-            <p className="text-sm text-gray-500">{contact.email}</p>
+            <p className="text-sm text-gray-500">
+              {contact.isOnWhatsApp ? "On WhatsApp" : "They are not on WhatsApp"}
+            </p>
           </div>
         ))}
       </div>

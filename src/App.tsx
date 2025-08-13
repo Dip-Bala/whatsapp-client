@@ -1,10 +1,30 @@
-import Layout from './Layout'
-import  {RecoilRoot } from 'recoil';
+import { RecoilRoot } from 'recoil';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Layout from './Layout';
+import type { JSX, ReactNode } from 'react';
 
-export default function App(){
+function PrivateRoute({ children }: { children: ReactNode }) {
+  const token = localStorage.getItem('authorization');
+  return token ? children : <Navigate to="/" replace />;
+}
+
+export default function App() {
   return (
     <RecoilRoot>
-    <Layout />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Router>
     </RecoilRoot>
-  )
+  );
 }

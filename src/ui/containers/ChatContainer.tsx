@@ -21,10 +21,3 @@ export default function ChatContainer(){
           </div>
     )
 }
-
-// function Background(){
-//       return(
-//             <img src="/assets/background.svg" className="w-screen h-screen bg-cover repeat "/>
-//       )
-// }
-
