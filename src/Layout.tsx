@@ -1,8 +1,9 @@
+// src/Layout.tsx
 import { useState } from "react";
 import ChatContainer from "./ui/containers/ChatContainer";
-import ContactsSidebar from "./ui/containers/ContactSidebar";
 import Sidebar from "./ui/containers/Sidebar";
 import Navbar from "./ui/containers/Navbar";
+import ContactsSidebar from "./ui/containers/ContactSidebar";
 
 export default function Layout() {
   const [view, setView] = useState<"chats" | "contacts">("chats");
@@ -12,7 +13,6 @@ export default function Layout() {
   function openChat(contact: any) {
     setSelectedContact(contact);
     if (window.innerWidth < 768) {
-      // if mobile size, switch to chat view
       setMobileView("chat");
     }
   }
@@ -24,37 +24,31 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen">
-      {/* Navbar visible only on md+ */}
       <div className="hidden md:block">
         <Navbar />
       </div>
 
-      {/* Desktop Layout */}
+      {/* Desktop */}
       <div className="hidden md:flex flex-1">
-        {/* Sidebar area */}
-          {view === "chats" && (
-            <Sidebar
-              onAddContact={() => setView("contacts")}
-              onOpenChat={openChat}
-            />
-          )}
-          {view === "contacts" && (
-            <ContactsSidebar
-              onBack={() => setView("chats")}
-              onSelectContact={(contact) => {
-                openChat(contact);
-                setView("chats");
-              }}
-            />
-          )}
+        {view === "chats" && (
+          <Sidebar
+            onAddContact={() => setView("contacts")}
+            onOpenChat={openChat}
+          />
+        )}
+        {view === "contacts" && (
+          <ContactsSidebar
+            onBack={() => setView("chats")}
+            onSelectContact={(contact: any) => {
+              openChat(contact);
+              setView("chats");
+            }}
+          />
+        )}
 
-        {/* Chat area */}
         <div className="flex-1">
           {selectedContact ? (
-            <ChatContainer
-              contact={selectedContact}
-              onBack={() => setSelectedContact(null)}
-            />
+            <ChatContainer contact={selectedContact} onBack={() => setSelectedContact(null)} />
           ) : (
             <div className="h-full flex items-center justify-center text-gray-400">
               Select a chat to start messaging
@@ -63,7 +57,7 @@ export default function Layout() {
         </div>
       </div>
 
-      {/* Mobile Layout */}
+      {/* Mobile */}
       <div className="flex md:hidden flex-1">
         {mobileView === "sidebar" && (
           <>
@@ -76,7 +70,7 @@ export default function Layout() {
             {view === "contacts" && (
               <ContactsSidebar
                 onBack={() => setView("chats")}
-                onSelectContact={(contact) => {
+                onSelectContact={(contact: any) => {
                   openChat(contact);
                   setView("chats");
                 }}

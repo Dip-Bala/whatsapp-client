@@ -1,73 +1,65 @@
-// src/context/WSContext.tsx
-import { createContext, useRef, useEffect, useState, useContext } from "react";
-
-const WS_URL = import.meta.env.VITE_WS_BACKEND_URL;
+import React, {
+  createContext,
+  useRef,
+  useEffect,
+  useContext,
+  type RefObject,
+} from "react";
+import { WS_URL } from "./config";
 
 interface WSContextType {
-  socketRef: React.MutableRefObject<WebSocket | null>;
   sendWS: (data: any) => void;
+  socketRef: RefObject<WebSocket | null>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
 
 export const WSProvider = ({ children }: { children: React.ReactNode }) => {
   const socketRef = useRef<WebSocket | null>(null);
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
 
   useEffect(() => {
-    if (!user) return;
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return;
+    const user = JSON.parse(storedUser || "{}");
+    if (!user?.email) return;
 
     const ws = new WebSocket(WS_URL);
     socketRef.current = ws;
 
     ws.onopen = () => {
       console.log("✅ WS Connected");
-      ws.send(JSON.stringify({ type: "join", userId: user._id }));
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("📩 WS Received:", data);
-
-      switch (data.type) {
-        case "receiveMessage":
-          // TODO: Update chat store
-          break;
-        case "userOnline":
-          // TODO: update contact status
-          break;
-        case "userOffline":
-          // TODO: update contact status
-          break;
-      }
+      ws.send(JSON.stringify({ type: "join", email: user.email }));
     };
 
     ws.onclose = () => console.log("❌ WS Disconnected");
     ws.onerror = (err) => console.error("⚠️ WS Error:", err);
 
     return () => {
-      if (ws.readyState <= 1) ws.close();
+      try {
+        if (ws.readyState <= 1) ws.close();
+      } catch {}
+      socketRef.current = null;
     };
-  }, [user]);
+  }, []);
 
   const sendWS = (data: any) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(data));
+    const ws = socketRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(data));
+    } else {
+      console.warn("WS not open; skipping send", data);
     }
   };
 
   return (
-    <WSContext.Provider value={{ socketRef, sendWS }}>
+    <WSContext.Provider value={{ sendWS, socketRef }}>
       {children}
     </WSContext.Provider>
   );
 };
 
 export const useWS = () => {
-  const ctx = useContext(WSContext);
-  if (!ctx) throw new Error("useWS must be used inside WSProvider");
-  return ctx;
+  const context = useContext(WSContext);
+  if (!context) throw new Error("useWS must be used inside WSProvider");
+  return context;
 };

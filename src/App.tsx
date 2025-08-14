@@ -1,12 +1,13 @@
-import { RecoilRoot } from 'recoil';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Layout from './Layout';
-import type { JSX, ReactNode } from 'react';
-import { WSProvider } from './ws';
+// src/App.tsx
+import { RecoilRoot } from "recoil";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Layout from "./Layout";
+import type { ReactNode } from "react";
+import { WSProvider } from "./ws";
 
 function PrivateRoute({ children }: { children: ReactNode }) {
-  const token = localStorage.getItem('authorization');
+  const token = localStorage.getItem("authorization");
   return token ? children : <Navigate to="/" replace />;
 }
 

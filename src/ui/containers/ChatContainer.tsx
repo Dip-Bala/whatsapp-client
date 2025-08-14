@@ -1,17 +1,22 @@
-import { useEffect, useState, useRef } from "react";
+// src/ui/containers/ChatContainer.tsx
+import { useEffect, useRef } from "react";
+import axios from "axios";
 import ChatBar from "../components/ChatBar";
 import InputBox from "../components/InputBox";
 import { useWS } from "../../ws";
+import { useRecoilState } from "recoil";
+import { API_URL } from "../../config";
+import { messagesAtom, type Message } from "../../hooks/atom";
 
 interface ChatContainerProps {
-  contact: any;
+  contact: { email: string; name?: string; profilePicUrl?: string; isOnline?: boolean };
   onBack: () => void;
 }
 
-interface Message {
+interface WSMessage {
   _id?: string;
-  sender: string;
-  receiver: string;
+  senderEmail: string;
+  receiverEmail: string;
   text: string;
   timestamp: string;
   status: "sent" | "delivered" | "read";
@@ -19,70 +24,98 @@ interface Message {
 
 export default function ChatContainer({ contact, onBack }: ChatContainerProps) {
   const { sendWS, socketRef } = useWS();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useRecoilState(messagesAtom(contact.email));
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = localStorage.getItem("authorization");
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // WS listener for incoming messages
+  // Load history on chat open
   useEffect(() => {
-    if (!socketRef.current) return;
+    if (!contact?.email) return;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_URL}/messages/${contact.email}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessages(res.data);
+        // Mark as read for delivered messages from this contact
+        sendWS({
+          type: "markAsRead",
+          senderEmail: contact.email,
+          receiverEmail: user.email,
+        });
+      } catch (e) {
+        console.error("Failed to load conversation", e);
+      }
+    })();
+  }, [contact.email, sendWS, setMessages, token, user.email]);
 
-    socketRef.current.onmessage = (event) => {
+  // WS listener to append messages + markAsRead result
+  useEffect(() => {
+    const ws = socketRef.current;
+    if (!ws) return;
+
+    const handleMessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
 
       if (data.type === "receiveMessage") {
-        if (
-          data.message.sender === contact._id ||
-          data.message.receiver === contact._id
-        ) {
-          setMessages((prev) => [...prev, data.message]);
+        const msg: WSMessage = data.message;
+        // Only add if for this chat
+        if (msg.senderEmail === contact.email || msg.receiverEmail === contact.email) {
+          const mapped: Message = {
+            _id: msg._id,
+            sender: "",
+            receiver: "",
+            senderEmail: msg.senderEmail,
+            receiverEmail: msg.receiverEmail,
+            text: msg.text,
+            timestamp: msg.timestamp,
+            status: msg.status,
+          };
+          setMessages((prev: any) => [...prev, mapped]);
+        }
+      }
+
+      if (data.type === "markAsRead") {
+        const { chatId } = data;
+        const thisChatId = [contact.email, user.email].sort().join("-");
+        if (chatId === thisChatId) {
+          setMessages((prev: any[]) =>
+            prev.map((m) =>
+              m.status === "delivered" ? { ...m, status: "read" } : m
+            )
+          );
         }
       }
     };
 
-    // Mark as read
-    sendWS({
-      type: "markAsRead",
-      senderId: contact._id,
-      receiverId: user._id,
-    });
-  }, [contact, socketRef, sendWS, user._id]);
+    ws.addEventListener("message", handleMessage);
+    return () => ws.removeEventListener("message", handleMessage);
+  }, [contact.email, setMessages, socketRef, user.email]);
 
-  // Handle sending message
+  // Send a message via WS (no duplicate HTTP save)
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-
-    const newMsg: Message = {
-      sender: user._id,
-      receiver: contact._id,
-      text,
-      timestamp: new Date().toISOString(),
-      status: "sent",
-    };
-
-    setMessages((prev) => [...prev, newMsg]);
-
     sendWS({
       type: "sendMessage",
-      senderId: user._id,
-      receiverId: contact._id,
+      senderEmail: user.email,
+      receiverEmail: contact.email,
       text,
     });
+    // No optimistic append to avoid duplicates; server echoes back immediately
   };
 
   return (
     <div className="h-screen flex flex-col flex-1 bg-[#f5f1ee]">
       <ChatBar contact={contact} onBack={onBack} />
 
-      {/* Messages with background */}
       <div className="relative flex-1 overflow-y-auto p-4">
-        {/* Background image layer */}
         <div
           className="absolute inset-0 z-0"
           style={{
@@ -94,23 +127,21 @@ export default function ChatContainer({ contact, onBack }: ChatContainerProps) {
           }}
         ></div>
 
-        {/* Message list */}
         <div className="relative z-10">
           {messages.map((m, idx) => (
             <div
-              key={idx}
-              className={`flex mb-2 ${
-                m.sender === user._id ? "justify-end" : "justify-start"
-              }`}
+              key={m._id || idx}
+              className={`flex mb-2 ${m.senderEmail === user.email ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={`px-4 py-2 rounded-lg max-w-xs ${
-                  m.sender === user._id
-                    ? "bg-green-500 text-white"
-                    : "bg-white text-black"
+                  m.senderEmail === user.email ? "bg-green-500 text-white" : "bg-white text-black"
                 }`}
               >
-                {m.text}
+                <p>{m.text}</p>
+                <span className="block text-xs text-gray-500 mt-1">
+                  {new Date(m.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} • {m.status}
+                </span>
               </div>
             </div>
           ))}
@@ -118,8 +149,7 @@ export default function ChatContainer({ contact, onBack }: ChatContainerProps) {
         </div>
       </div>
 
-      {/* Input Box */}
-      <InputBox contactId={contact._id} onSend={handleSendMessage} />
+      <InputBox onSend={handleSendMessage} />
     </div>
   );
 }
