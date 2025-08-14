@@ -1,15 +1,21 @@
-export default function ChatPreview(){
+interface IChatPreview{
+    name: String,
+    lastMessage: String
+}
+
+export default function ChatPreview({name, lastMessage}: IChatPreview){
     return(
         <div className="flex gap-2 items-center">
             <div className="p-2">
+                {/* include images as well */}
                 <img src="/assets/profile.jpeg" className="rounded-full w-12 h-12" />
             </div>
             <div className="flex flex-col">
                 <p>
-                    Diya Bala
+                    {name}
                 </p>
                 <span className="text-black/60 text-sm">
-                    hi there, long time no see
+                    {lastMessage}
                 </span>
             </div>
         </div>

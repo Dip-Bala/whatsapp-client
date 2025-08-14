@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Layout from './Layout';
 import type { JSX, ReactNode } from 'react';
+import { WSProvider } from './ws';
 
 function PrivateRoute({ children }: { children: ReactNode }) {
   const token = localStorage.getItem('authorization');
@@ -19,7 +20,9 @@ export default function App() {
             path="/chat"
             element={
               <PrivateRoute>
-                <Layout />
+                <WSProvider>
+                  <Layout />
+                </WSProvider>
               </PrivateRoute>
             }
           />

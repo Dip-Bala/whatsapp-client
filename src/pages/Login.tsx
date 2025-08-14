@@ -11,7 +11,6 @@ export default function Login() {
   const navigate = useNavigate();
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    // console.log("Login with:", { name, email });
     try{
       const response = await axios.post(`${API_URL}/login`, {
         name: name,
@@ -21,12 +20,14 @@ export default function Login() {
           contentType: 'application/json'
         }
       })
-      if(response.status === 200){
+      if(response.status === 200 || response.status === 201){
+        console.log(response)
         localStorage.setItem('authorization', response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         navigate('/chat')
       }
       else{
-        
+        alert(response.data.message);
       }
     }catch(e){
       console.log(e)
@@ -43,7 +44,7 @@ export default function Login() {
 
       {/* Main content */}
       <div className="flex flex-col items-center justify-center">
-        {/* <div className="p-8 max-w-lg w-full"> */}
+        <div className="p-8 max-w-lg w-full">
           {/* Heading */}
           <div className="flex flex-col items-center justify-between pb-4 mb-6 gap-4 ">
             <h1 className="text-5xl">WhatsApp Web</h1>
@@ -60,7 +61,7 @@ export default function Login() {
             <input
               type="text"
               placeholder="Your Name"
-              className="border-b border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00a884]"
+              className="border-b border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00a884]"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -68,7 +69,7 @@ export default function Login() {
             <input
               type="email"
               placeholder="Your Email"
-              className="border-b border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00a884]"
+              className="border-b border-gray-300  px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00a884]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -76,12 +77,12 @@ export default function Login() {
 
             <button
               type="submit"
-              className="bg-green-500 text-white font-semibold py-2 rounded-md hover:bg-[#029c7d] transition-colors"
+              className="bg-green-500 text-white font-semibold py-2 rounded-lg hover:bg-transparent cursor-pointer hover:border hover:text-green-600 transition-colors"
             >
               Login
             </button>
           </form>
-        {/* </div> */}
+        </div>
       </div>
     </div>
   );

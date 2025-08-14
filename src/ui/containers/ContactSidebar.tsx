@@ -1,7 +1,9 @@
 import { FaUserPlus } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import { FaArrowLeftLong } from "react-icons/fa6";
 import axios from "axios";
 import { API_URL } from "../../config";
+import IconButton from "../components/IconButtons";
 
 interface Contact {
   _id: string;
@@ -10,36 +12,38 @@ interface Contact {
   isOnWhatsApp?: boolean;
 }
 
-export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
+export default function ContactsSidebar({ onBack, onSelectContact }: { onBack: () => void, onSelectContact: (c: Contact) => void }) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
-
+  const [refreshFlag, setRefreshFlag] = useState(0);
   const token = localStorage.getItem("authorization");
 
   // Fetch contacts from DB
   useEffect(() => {
     async function fetchContacts() {
       try {
-        const res = await axios.get(`${API_URL}/contacts`, {
+        const res = await axios.get(`${API_URL}/contact`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setContacts(res.data);
+        console.log(contacts);
       } catch (err) {
         console.error(err);
       }
     }
     fetchContacts();
-  }, []);
+  }, [token, refreshFlag]);
 
   // Save contact to DB
   async function handleAddContact(e: React.FormEvent) {
     e.preventDefault();
+    console.log(newName)
     try {
       const res = await axios.post(
-        `${API_URL}/contacts`,
+        `${API_URL}/contact`,
         { name: newName, email: newEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -47,6 +51,7 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
       setNewName("");
       setNewEmail("");
       setShowForm(false);
+      setRefreshFlag(prev => prev + 1); 
     } catch (err) {
       console.error(err);
     }
@@ -59,11 +64,12 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
   return (
     <div className="md:border-r border-black/20 h-screen w-full md:w-sm lg:w-md md:ml-16 p-4 overflow-y-scroll bg-white">
       {/* Header */}
-      <div className="bg-amber-300 flex justify-between p-2">
-        <button onClick={onBack} className="text-sm text-gray-500 hover:underline">
-          backkk
-        </button>
-        <p className="font-semibold text-xl">New Chat</p>
+      <div className="flex justify-between p-2">
+        <IconButton
+          onClick={onBack}
+          inactiveIcon={<FaArrowLeftLong className="" />}
+        />
+        <p className="font-medium text-md">New Chat</p>
       </div>
 
       {/* Search bar */}
@@ -75,9 +81,15 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
           onChange={e => setSearch(e.target.value)}
           className="bg-pampas rounded-4xl pl-4 py-2 placeholder:text-sm placeholder:text-mediumdarkgray focus:outline-logogreen flex-1"
         />
+
+        {/* <IconButton
+          onClick={onBack}
+          className="bg-green-600"
+          activeIcon={<FaUserPlus className="text-white " />}
+        /> */}
         <button
           onClick={() => setShowForm(true)}
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600"
+          className=" cursor-pointer bg-green-500 text-white p-2 rounded-full hover:bg-green-600"
         >
           <FaUserPlus />
         </button>
@@ -104,7 +116,7 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
           />
           <button
             type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Save Contact
           </button>
@@ -117,6 +129,7 @@ export default function ContactsSidebar({ onBack }: { onBack: () => void }) {
           <div
             key={contact._id}
             className="p-2 rounded hover:bg-gray-100 cursor-pointer"
+            onClick={() => onSelectContact(contact)}
           >
             <p className="font-medium">{contact.name}</p>
             <p className="text-sm text-gray-500">
