@@ -14,10 +14,10 @@ export default function ChatBar({
   onBack: () => void;
 }) {
   return (
-    <div className="flex justify-between items-center px-4 py-2 shadow-b shadow-md w-full bg-white">
-      <div className="flex items-center gap-2">
-        <IconButton onClick={onBack} inactiveIcon={<FaArrowLeftLong className="w-5 h-5" />} />
-
+    <div className="flex justify-between items-center px-4 py-3  shadow-b shadow-md w-full bg-white z-10">
+      <div className="flex items-center gap-2 md:gap-0">
+        <IconButton onClick={onBack} inactiveIcon={<FaArrowLeftLong className="w-4 h-4 md:hidden "/>} />
+        <div className="flex items-center gap-2 ">
         {contact.profilePicUrl ? (
           <img
             src={contact.profilePicUrl}
@@ -30,10 +30,11 @@ export default function ChatBar({
 
         <div className="flex flex-col">
           <p className="font-medium">{contact.name || contact.email}</p>
-          <span className="text-xs text-gray-500">
+          {/* <span className="text-xs text-gray-500">
             {contact.isOnline ? "Online" : "Offline"}
-          </span>
+          </span> */}
         </div>
+      </div>
       </div>
 
       <div className="flex items-center gap-4">

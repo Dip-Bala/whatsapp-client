@@ -1,5 +1,6 @@
 // src/state/atoms.ts
 import { atom, atomFamily } from "recoil";
+import type { Contact } from "../ui/containers/ContactSidebar";
 
 export type NavItemsTypes = "messages" | "channels" | "community" | "status";
 
@@ -46,4 +47,9 @@ export const messagesAtom = atomFamily<Message[], string>({
 export const userAtom = atom<User | null>({
   key: "userAtom",
   default: null,
+});
+
+export const contactsAtom = atom<Contact[]>({
+  key: "contactsAtom", 
+  default: [],
 });

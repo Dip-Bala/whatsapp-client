@@ -1,12 +1,12 @@
-import { SearchIcon } from "../icons/NavbarIcons";
+import { IoMdSearch } from "react-icons/io";
 
 export default function SearchBar(){
   return (
-    <div className="py-2 relative ">
-      <SearchIcon />
+    <div className="py-2 relative">
+      <IoMdSearch className="absolute top-5 left-4"/>
       <input type="search" 
       placeholder="Search or Start a new chat"
-      className="w-full bg-pampas rounded-4xl pl-12 py-2 hover:outline placeholder:text-sm placeholder:text-mediumdarkgray focus:border-none focus:outline-logogreen focus:bg-white flex items-center" 
+      className="w-full pl-12 py-2 focus:bg-white flex items-center bg-brownishgray rounded-4xl placeholder:text-sm placeholder:text-mediumdarkgray focus:outline-logogreen flex-1" 
       ></input>
     </div>
 

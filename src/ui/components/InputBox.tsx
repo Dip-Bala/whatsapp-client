@@ -1,4 +1,4 @@
-// src/ui/components/InputBox.tsx
+
 import { RiEmojiStickerLine } from "react-icons/ri";
 import { HiPlus } from "react-icons/hi";
 import { IoSend } from "react-icons/io5";
@@ -15,7 +15,7 @@ export default function InputBox({ onSend }: { onSend: (text: string) => void })
   };
 
   return (
-    <div className="bg-white rounded-4xl px-4 py-2 flex items-center justify-between m-4">
+    <div className="bg-white rounded-4xl px-4 py-2 flex items-center justify-between m-4 z-10">
       <IconButton onClick={() => {}} inactiveIcon={<HiPlus className="text-black w-6 h-6" />} />
       <IconButton onClick={() => {}} inactiveIcon={<RiEmojiStickerLine className="text-black w-6 h-6" />} />
       <input

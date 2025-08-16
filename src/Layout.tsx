@@ -1,4 +1,4 @@
-// src/Layout.tsx
+
 import { useState } from "react";
 import ChatContainer from "./ui/containers/ChatContainer";
 import Sidebar from "./ui/containers/Sidebar";

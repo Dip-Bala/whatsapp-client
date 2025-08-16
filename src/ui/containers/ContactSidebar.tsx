@@ -1,17 +1,27 @@
-// src/ui/containers/ContactsSidebar.tsx
+
 import { FaUserPlus } from "react-icons/fa";
 import { useState, useEffect } from "react";
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { FaArrowLeftLong, FaUser } from "react-icons/fa6";
 import axios from "axios";
 import { API_URL } from "../../config";
 import IconButton from "../components/IconButtons";
+import { IoMailSharp } from "react-icons/io5";
+import { contactsAtom } from "../../hooks/atom";
+import { useRecoilState } from "recoil";
 
-interface Contact {
+export interface Contact {
   _id: string;
+  owner: string;
   name: string;
   email: string;
-  isOnWhatsApp?: boolean;
+  profilePicUrl: string | null;
+  isOnline: boolean;
+  linkedUser: string | null;
+  isOnWhatsApp: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
+
 
 export default function ContactsSidebar({
   onBack,
@@ -20,7 +30,7 @@ export default function ContactsSidebar({
   onBack: () => void;
   onSelectContact: (c: Contact) => void;
 }) {
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contacts, setContacts] = useRecoilState(contactsAtom);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState("");
@@ -35,6 +45,7 @@ export default function ContactsSidebar({
           headers: { Authorization: `Bearer ${token}` },
         });
         setContacts(res.data);
+        console.log(contacts); //for contact test
       } catch (err) {
         console.error(err);
       }
@@ -65,13 +76,13 @@ export default function ContactsSidebar({
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="md:border-r border-black/20 h-screen w-full md:w-sm lg:w-md md:ml-16 p-4 overflow-y-scroll bg-white">
+    <div className="md:border-r border-black/20 h-screen w-full md:w-sm lg:w-md md:ml-16 p-4 overflow-y-scroll bg-white z-10">
       <div className="flex justify-between p-2">
         <IconButton onClick={onBack} inactiveIcon={<FaArrowLeftLong className="" />} />
         <p className="font-medium text-md">New Chat</p>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col gap-6 mb-4">
         <input
           type="text"
           placeholder="Search contacts..."
@@ -81,33 +92,41 @@ export default function ContactsSidebar({
         />
         <button
           onClick={() => setShowForm(true)}
-          className="cursor-pointer bg-green-500 text-white p-2 rounded-full hover:bg-green-600"
+          className="flex items-center gap-4 cursor-pointer hover:bg-pampas rounded-4xl p-2"
         >
-          <FaUserPlus />
+          <span className="bg-green-600 text-white rounded-full"><FaUserPlus className="w-10 h-10 p-2" /></span>
+          <span className="text-black text-md">New Contact</span>
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleAddContact} className="mb-4 space-y-2">
-          <input
-            type="text"
-            placeholder="Name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
+        <form onSubmit={handleAddContact} className="flex flex-col gap-4 mb-4 space-y-2">
+          <div className="flex gap-4 items-center ">
+            <div><FaUser className="w-4 h-4 text-mediumdarkgray" /></div>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              required
+              className="w-full border-b-2 border-mediumdarkgray/60 py-1 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex gap-4 items-center ">
+            <div><IoMailSharp className="w-4 h-4 text-mediumdarkgray" /></div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              required
+              className="w-full border-b-2 border-mediumdarkgray/60 py-1 focus:outline-none"
+            />
+          </div>
           <button
             type="submit"
-            className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            className="cursor-pointer border border-green-600 rounded-lg text-mediumdarkgray px-4 py-2  hover:bg-green-600 hover:text-white"
           >
             Save Contact
           </button>
@@ -118,7 +137,7 @@ export default function ContactsSidebar({
         {filteredContacts.map((contact) => (
           <div
             key={contact._id}
-            className="p-2 rounded hover:bg-gray-100 cursor-pointer"
+            className="p-2 hover:bg-brownishgray cursor-pointer rounded-xl"
             onClick={() => onSelectContact(contact)}
           >
             <p className="font-medium">{contact.name}</p>

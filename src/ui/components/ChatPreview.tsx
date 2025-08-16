@@ -1,4 +1,3 @@
-// src/ui/components/ChatPreview.tsx
 interface IChatPreview {
     name: string;
     lastMessage: string;

@@ -11,7 +11,7 @@ export default function Navbar() {
   const [navItem, setNavItem] = useRecoilState(navAtom);
 
   return (
-    <div className="bg-pampas w-full h-16 md:h-screen md:w-16 fixed md:left-0 md:right-0 bottom-0 p-4 md:border-r border-gray-200 border-t">
+    <div className="bg-pampas w-full h-16 md:h-screen md:w-16 fixed md:left-0 md:right-0 bottom-0 p-4 md:border-r border-gray-200 border-t z-10">
       <div className="flex gap-2 md:flex-col items-center w-full justify-around">
         <IconButton
           isActive={navItem === "messages"}

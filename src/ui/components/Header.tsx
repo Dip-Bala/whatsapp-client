@@ -5,8 +5,8 @@ import SearchBar from "./SearchBar";
 
 export default function Header({ onShowContacts }: { onShowContacts: () => void }) {
   return (
-    <div className="pt-2 w-full overflow-hidden bg-white sticky top-0 z-10">
-      <div className="flex justify-between items-center p-2 sm:gap-4">
+    <div className="w-full overflow-hidden bg-white sticky top-0 z-10">
+      <div className="flex justify-between items-center px-2 sm:gap-4">
         <h2 className="text-logogreen font-semibold text-xl">WhatsApp</h2>
         <div className="flex gap-4">
           {/* Add & preview contact button */}

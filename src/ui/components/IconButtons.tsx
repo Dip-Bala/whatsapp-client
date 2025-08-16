@@ -10,7 +10,7 @@ interface NavButtonProps {
 export default function IconButton({ isActive, onClick, activeIcon, inactiveIcon }: NavButtonProps) {
   return (
     <button
-      className={`hover:bg-neutral-300 rounded-full p-2 cursor-pointer ${isActive ? "bg-neutral-300 flex" : ""}`}
+      className={`hover:bg-[#eae9e7] rounded-full p-2 cursor-pointer ${isActive ? "bg-[#eae9e7] flex" : ""}`}
       type="button"
       onClick={onClick}
     >
