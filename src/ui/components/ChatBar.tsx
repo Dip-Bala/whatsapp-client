@@ -1,4 +1,3 @@
-// src/ui/components/ChatBar.tsx
 import { IoMdSearch } from "react-icons/io";
 import { LuVideo } from "react-icons/lu";
 import { HiDotsVertical } from "react-icons/hi";
